@@ -4,6 +4,7 @@ import com.vaadin.flow.shared.Registration;
 import lu.lusis.demo.backend.data.Message;
 import lu.lusis.demo.backend.repository.MessageRepository;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -11,6 +12,8 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class InboxBroadcaster {
+
+    private static List<Message> deletedMessageList;
 
     private static List<Message> messageList;
 
@@ -26,8 +29,9 @@ public class InboxBroadcaster {
             synchronized (InboxBroadcaster.class) {
                 listeners.remove(listener);
                 if (listeners.isEmpty()){
-                    // on peut vider la liste
+                    // we can clear the lists
                     messageList = null;
+                    deletedMessageList = null;
                 }
             }
         };
@@ -42,9 +46,34 @@ public class InboxBroadcaster {
     public static List<Message> getMessageList(MessageRepository messageRepository) {
         synchronized (InboxBroadcaster.class) {
             if (messageList == null){
-                messageList = messageRepository.findByDeletedFalse();
+                messageList = Collections.synchronizedList(messageRepository.findByDeletedFalse());
             }
         }
         return messageList;
+    }
+
+
+    public static List<Message> getDeletedMessageList(MessageRepository messageRepository) {
+        synchronized (InboxBroadcaster.class) {
+            if (deletedMessageList == null){
+                deletedMessageList = Collections.synchronizedList(messageRepository.findByDeletedTrue());
+            }
+        }
+        return deletedMessageList;
+    }
+
+
+    public static void deleteMessage(Message message){
+        synchronized (InboxBroadcaster.class) {
+            if(messageList!=null)messageList.remove(message);
+            if(deletedMessageList!=null)deletedMessageList.add(message);
+        }
+    }
+
+    public static void addMessage(Message message){
+        synchronized (InboxBroadcaster.class) {
+            if(messageList!=null)messageList.add(message);
+            if(deletedMessageList!=null)deletedMessageList.remove(message);
+        }
     }
 }

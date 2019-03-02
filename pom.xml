@@ -13,7 +13,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Dependencies -->
-        <vaadin.version>12.0.3</vaadin.version>
+        <vaadin.version>12.0.7</vaadin.version>
     </properties>
 
     <parent>
@@ -79,6 +79,12 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.vaddon</groupId>
+            <artifactId>mediaquery</artifactId>
+            <version>1.0.2</version>
         </dependency>
 
     </dependencies>

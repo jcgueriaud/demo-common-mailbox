@@ -5,6 +5,7 @@ import com.vaadin.flow.component.grid.GridContextMenu;
 import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import lu.lusis.demo.backend.data.Message;
 import lu.lusis.demo.backend.repository.MessageRepository;
@@ -22,13 +23,14 @@ class CommonMailViewUtils {
                 .setFlexGrow(0).setWidth("40px");
         messageGrid.addComponentColumn((message -> message.isRead()?VaadinIcon.OPEN_BOOK.create():VaadinIcon.BOOK.create()))
                 .setFlexGrow(0).setWidth("40px");
-        messageGrid.addColumn(Message::getFromUser).setHeader("From").setSortProperty("fromUser");;
-        messageGrid.addColumn(Message::getSubject).setHeader("Subject").setSortProperty("subject");;
+        messageGrid.addColumn(Message::getFromUser).setHeader("From").setSortProperty("fromUser");
+        messageGrid.addColumn(Message::getSubject).setHeader("Subject").setSortProperty("subject");
+        messageGrid.addColumn(Message::getId).setHeader("ID").setSortProperty("id").setFlexGrow(0).setWidth("40px");
         messageGrid.addColumn(
                 new LocalDateTimeRenderer<>(Message::getCreationDate,  DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM)))
-                .setHeader("Received").setFlexGrow(0).setWidth("200px").setSortProperty("id");
+                .setHeader("Received").setFlexGrow(0).setWidth("200px").setSortProperty("id").setKey("creationDate");
         selectionModel.addSelectionListener(event -> {
-            event.getAllSelectedItems().stream().filter(message -> !message.isRead()).filter(m -> InboxBroadcaster.getMessageList(messageRepository).contains(m))
+            event.getAllSelectedItems().stream().filter(message -> !message.isRead()).filter(m -> (((ListDataProvider<Message>) messageGrid.getDataProvider()).getItems().contains(m)))
                     .forEach(
                     message -> {
                         message.setRead(true);
@@ -44,7 +46,7 @@ class CommonMailViewUtils {
 
         messageGridContextMenu.addItem("Mark As Important",
                 e ->
-                        messageGrid.getSelectedItems().stream().filter(m -> InboxBroadcaster.getMessageList(messageRepository).contains(m))
+                        messageGrid.getSelectedItems().stream().filter(m -> (((ListDataProvider<Message>) messageGrid.getDataProvider()).getItems().contains(m)))
                                 .filter(message -> !message.isImportant())
                                 .forEach(
                                         message -> {
@@ -57,7 +59,7 @@ class CommonMailViewUtils {
 
         messageGridContextMenu.addItem("Mark As Not Important",
                 e ->
-                        messageGrid.getSelectedItems().stream().filter(m -> InboxBroadcaster.getMessageList(messageRepository).contains(m))
+                        messageGrid.getSelectedItems().stream().filter(m -> (((ListDataProvider<Message>) messageGrid.getDataProvider()).getItems().contains(m)))
                                 .filter(Message::isImportant)
                                 .forEach(
                                         message -> {
@@ -72,11 +74,12 @@ class CommonMailViewUtils {
 
             messageGridContextMenu.addItem("Restore",
                     e ->
-                            messageGrid.getSelectedItems().stream().filter(m -> InboxBroadcaster.getMessageList(messageRepository).contains(m))
+                            messageGrid.getSelectedItems().stream().filter(m -> (((ListDataProvider<Message>) messageGrid.getDataProvider()).getItems().contains(m)))
                                     .forEach(
                                             message -> {
                                                 message.setDeleted(false);
                                                 messageRepository.save(message);
+                                                InboxBroadcaster.addMessage(message);
                                                 InboxBroadcaster.broadcast(message);
                                             }
                                     )
@@ -84,11 +87,12 @@ class CommonMailViewUtils {
         } else {
             messageGridContextMenu.addItem("Trash",
                     e ->
-                            messageGrid.getSelectedItems().stream().filter(m -> InboxBroadcaster.getMessageList(messageRepository).contains(m))
+                            messageGrid.getSelectedItems().stream().filter(m -> (((ListDataProvider<Message>) messageGrid.getDataProvider()).getItems().contains(m)))
                                     .forEach(
                                             message -> {
                                                 message.setDeleted(true);
                                                 messageRepository.save(message);
+                                                InboxBroadcaster.deleteMessage(message);
                                                 InboxBroadcaster.broadcast(message);
                                             }
                                     )
