@@ -15,7 +15,7 @@ import com.vaadin.flow.shared.Registration;
 import lu.lusis.demo.ui.broadcaster.Broadcaster;
 
 /**
- *
+ * Example from https://vaadin.com/docs/v12/flow/advanced/tutorial-push-broadcaster.html
  */
 @Push
 @Route("broadcaster")

@@ -7,6 +7,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+/**
+ * Example from https://vaadin.com/docs/v12/flow/advanced/tutorial-push-broadcaster.html
+ */
 public class Broadcaster {
     static Executor executor = Executors.newSingleThreadExecutor();
 
