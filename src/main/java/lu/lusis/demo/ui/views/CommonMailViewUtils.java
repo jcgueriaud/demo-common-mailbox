@@ -36,8 +36,6 @@ class CommonMailViewUtils {
                         message.setRead(true);
                         messageRepository.save(message);
                         InboxBroadcaster.broadcast(message);
-                        //publisher.onNext(message);
-                        //messageGrid.getDataProvider().refreshItem(message);
                     }
             );
         });

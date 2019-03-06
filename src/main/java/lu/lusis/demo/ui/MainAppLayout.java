@@ -14,6 +14,7 @@ import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.PWA;
 import lu.lusis.demo.ui.views.CommonMailboxView;
 import lu.lusis.demo.ui.views.CommonTrashView;
+import lu.lusis.demo.ui.views.MailboxView;
 
 
 @PWA(name="Common Mailbox", shortName = "commonMB", description = "Common Mail box ")
@@ -34,6 +35,7 @@ public class MainAppLayout extends AppLayoutRouterLayout {
                         .get()
                         .add(new LeftNavigationComponent("Inbox", VaadinIcon.INBOX.create(), CommonMailboxView.class))
                         .add(new LeftNavigationComponent("Trash", VaadinIcon.TRASH.create(), CommonTrashView.class))
+                        .add(new LeftNavigationComponent("Mailbox", VaadinIcon.MAILBOX.create(), MailboxView.class))
                         .build())
                 .build();
     }

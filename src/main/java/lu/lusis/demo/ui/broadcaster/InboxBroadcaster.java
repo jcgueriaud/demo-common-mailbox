@@ -7,6 +7,7 @@ import lu.lusis.demo.backend.repository.MessageRepository;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -75,5 +76,19 @@ public class InboxBroadcaster {
             if(messageList!=null)messageList.add(message);
             if(deletedMessageList!=null)deletedMessageList.remove(message);
         }
+    }
+    public static void editMessage(Message message){
+        synchronized (InboxBroadcaster.class) {
+            if(messageList!=null && messageList.contains(message)){
+                messageList.set(messageList.indexOf(message),message);
+            };
+            if(deletedMessageList!=null && deletedMessageList.contains(message)){
+                deletedMessageList.set(deletedMessageList.indexOf(message),message);
+            }
+        }
+    }
+
+    public static Optional<Message> findById(MessageRepository messageRepository, int id){
+        return getMessageList(messageRepository).stream().filter(message -> id == message.getId()).findFirst();
     }
 }
